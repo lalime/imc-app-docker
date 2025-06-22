@@ -1,0 +1,41 @@
+# frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imc-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: imc-frontend
+  template:
+    metadata:
+      labels:
+        app: imc-frontend
+    spec:
+      containers:
+        - name: imc-frontend
+          image: lalim/imc-frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: frontend-code
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: frontend-code
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: imc-frontend
+spec:
+  selector:
+    app: imc-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort

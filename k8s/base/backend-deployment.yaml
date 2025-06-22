@@ -1,0 +1,44 @@
+# backend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imc-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: imc-backend
+  template:
+    metadata:
+      labels:
+        app: imc-backend
+    spec:
+      containers:
+        - name: imc-backend
+          imagePullPolicy: Never
+          image: lalim/imc-backend:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MYSQL_HOST
+              value: mysql
+          volumeMounts:
+            - name: backend-code
+              mountPath: /app/backend
+      volumes:
+        - name: backend-code
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: imc-backend
+spec:
+  selector:
+    app: imc-backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP
