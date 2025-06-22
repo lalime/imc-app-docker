@@ -2,14 +2,29 @@ version: '3.8'
 services:
   backend:
     build: ./backend
+    image: lalim/imc-backend:latest
     ports:
       - "5000:5000"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       - MYSQL_HOST=mysql
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./backend
+          target: /app/backend
+        - action: rebuild
+          path: requirements.txt
   frontend:
     build: ./frontend
+    image: lalim/imc-frontend:latest
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /usr/share/nginx/html
     ports:
       - "80:80"
   mysql:
@@ -20,3 +35,8 @@ services:
       - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

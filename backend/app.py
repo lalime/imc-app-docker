@@ -58,22 +58,3 @@ def history():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
-
-# Ensure the database and table exist
-def init_db():
-    """Initialize the database and create the table if it doesn't exist."""
-    cursor.execute("""
-        CREATE DATABASE IF NOT EXISTS imc_db;
-    """)
-    cursor.execute("""
-        USE imc_db;
-        CREATE TABLE IF NOT EXISTS bmi_records (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            weight FLOAT NOT NULL,
-            height FLOAT NOT NULL,
-            bmi FLOAT NOT NULL,
-            category VARCHAR(20) NOT NULL
-        );
-    """)
-    db.commit()
