@@ -21,16 +21,16 @@ git clone https://github.com/your-username/imc-app-docker.git
 cd imc-app-docker
 ```
 
-### 2. Build the Docker image
+### 2. Deploy using docker-compose
 
 ```bash
 docker build -t imc-app .
 ```
 
-### 3. Run the container
+### 3. Deploy with kubernetes
 
 ```bash
-docker run -p 8080:80 imc-app
+kubectl apply -f ./k8s/base/
 ```
 
 The app will be available at [http://localhost:8080](http://localhost:8080).
@@ -39,8 +39,11 @@ The app will be available at [http://localhost:8080](http://localhost:8080).
 
 ```
 imc-app-docker/
-├── src/                # Application source code
-├── Dockerfile
+├── backend/                # Application source code
+├── frontend/                # Application source code
+├── k8s/
+└── Readme.md
+└── docker-compose.yml
 └── Readme.md
 ```
 
