@@ -24,7 +24,7 @@ cd imc-app-docker
 ### 2. Deploy using docker-compose
 
 ```bash
-docker build -t imc-app .
+docker compose up --build
 ```
 
 ### 3. Deploy with kubernetes

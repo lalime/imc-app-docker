@@ -1,8 +1,8 @@
 version: '3.8'
 services:
   backend:
-    build: ./backend
-    image: lalim/imc-backend:latest
+    build:
+      context: ./backend
     ports:
       - "5000:5000"
     depends_on:
@@ -10,33 +10,54 @@ services:
         condition: service_healthy
     environment:
       - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=mydatabase
     develop:
       watch:
         - action: sync+restart
           path: ./backend
           target: /app/backend
         - action: rebuild
-          path: requirements.txt
+          path: ./backend/requirements.txt
+    networks:
+      - app-network
+
   frontend:
-    build: ./frontend
-    image: lalim/imc-frontend:latest
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
     develop:
       watch:
         - action: sync
           path: ./frontend
           target: /usr/share/nginx/html
-    ports:
-      - "80:80"
+    networks:
+      - app-network
+
   mysql:
     image: mysql:8.0
     environment:
       - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=mydatabase
     volumes:
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql-data:/var/lib/mysql
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
       - "3306:3306"
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-ppassword"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
+    networks:
+      - app-network
+
+volumes:
+  mysql-data:
+
+networks:
+  app-network:
+    driver: bridge
